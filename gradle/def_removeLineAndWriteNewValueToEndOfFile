@@ -1,0 +1,28 @@
+def addRatchetPortToEnvFile() {
+    File inputFile = new File('.env.local')
+    File tempFile = new File('.env.local.temp')
+
+    BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+    BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
+
+    def lineToRemove = 'APP_RATCHET_PORT='
+    String currentLine
+
+    while((currentLine = reader.readLine()) != null) {
+        if (currentLine.startsWith(lineToRemove)) {
+            continue
+        }
+
+        writer.write(currentLine + System.getProperty("line.separator"));
+    }
+
+    writer.close();
+    reader.close();
+    tempFile.renameTo(inputFile);
+
+    exec {
+        commandLine 'chmod', '777', '.env.local'
+    }
+
+    inputFile.append('APP_RATCHET_PORT=' + ratchet_port)
+}
